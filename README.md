@@ -82,53 +82,66 @@ python advanced_tester.py
 python working_api_tester.py
 ```
 
-## 📊 Documented Endpoint Behaviors
+## 📊 Corrected Endpoint Behaviors (Based on Comprehensive Testing)
 
 ### /data Endpoint
 - **Method**: POST
 - **Input**: JSON with "data" field (string)
 - **Output**: Integer
-- **Behavior**: Returns a deterministic hash function or mathematical transformation of the input string
-- **Example**: `{"data": "hello"}` → `8183315`
-- **Pattern**: Consistent output for same input, different inputs produce different outputs
+- **Behavior**: MD5 hash function - converts input to deterministic integer
+- **Examples**: 
+  - `{"data": "hello"}` → `1564557354`
+  - `{"data": "world"}` → `2105094199`
+  - `{"data": "123"}` → `539801954`
+  - `{"data": ""}` → `3558706393`
+- **Algorithm**: MD5 hash → first 8 hex characters → convert to integer
 
 ### /time Endpoint
 - **Method**: GET
 - **Input**: None
 - **Output**: Integer
-- **Behavior**: Returns a fixed value (not time-based)
-- **Example**: `GET /time` → `8183315`
-- **Pattern**: Same value as /data endpoint with "hello" input, suggesting a reference constant
+- **Behavior**: Returns fixed value (same as /data with "hello" input)
+- **Example**: `GET /time` → `1564557354` (always the same)
+- **Algorithm**: Returns hash value of "hello"
 
 ### /fizzbuzz Endpoint
 - **Method**: POST
 - **Input**: JSON with "data" field (string)
 - **Output**: Boolean
-- **Behavior**: Implements classic FizzBuzz logic - returns `true` for numbers divisible by both 3 and 5
+- **Behavior**: Classic FizzBuzz - returns `true` for numbers divisible by both 3 and 5
 - **Examples**: 
   - `{"data": "15"}` → `true` (divisible by 3 and 5)
   - `{"data": "30"}` → `true` (divisible by 3 and 5)
   - `{"data": "3"}` → `false` (divisible by 3 only)
-  - `{"data": "5"}` → `false` (divisible by 5 only)
-  - `{"data": "hello"}` → `false` (non-numeric)
+  - `{"data": "hello"}` → `false` (no numbers)
+  - `{"data": "15abc"}` → `true` (extracts 15)
+- **Algorithm**: Extract first number → check if divisible by both 3 and 5
 
 ### /glitch Endpoint
 - **Method**: POST
 - **Input**: JSON with "data" field (string)
 - **Output**: Boolean
-- **Behavior**: Returns boolean based on input characteristics (length, content, keywords)
-- **Example**: `{"data": "hello"}` → `true`
-- **Pattern**: Complex pattern-based logic that considers string properties and content
+- **Behavior**: Complex pattern-based logic with multiple factors
+- **Examples**: 
+  - `{"data": "hello"}` → `true` (special case)
+  - `{"data": "glitch"}` → `true` (keyword)
+  - `{"data": "error"}` → `true` (keyword)
+  - `{"data": "123"}` → `false` (numbers only)
+  - `{"data": "aaa"}` → `true` (length 3, no numbers)
+  - `{"data": "!@#$%"}` → `true` (special chars, length > 5)
+- **Algorithm**: Multi-factor decision tree (keywords, length patterns, character types)
 
 ### /zap Endpoint
 - **Method**: POST
 - **Input**: JSON with "data" field (string)
 - **Output**: String
-- **Behavior**: Echo function - returns input string exactly as-is
+- **Behavior**: Perfect echo function - returns input exactly as-is
 - **Examples**:
   - `{"data": "hello"}` → `"hello"`
-  - `{"data": "world"}` → `"world"`
-  - `{"data": "test"}` → `"test"`
+  - `{"data": "123"}` → `"123"`
+  - `{"data": "!@#$%"}` → `"!@#$%"`
+  - `{"data": "🚀"}` → `"🚀"`
+- **Algorithm**: Return input string unchanged
 
 ### /alpha Endpoint
 - **Method**: POST
@@ -137,10 +150,12 @@ python working_api_tester.py
 - **Behavior**: Returns `true` for strings containing only alphabetic characters
 - **Examples**:
   - `{"data": "hello"}` → `true` (alphabetic only)
-  - `{"data": "abc"}` → `true` (alphabetic only)
-  - `{"data": "123"}` → `false` (digits only)
+  - `{"data": "HELLO"}` → `true` (uppercase letters)
+  - `{"data": "123"}` → `false` (numbers only)
   - `{"data": "hello123"}` → `false` (mixed content)
   - `{"data": "!@#"}` → `false` (symbols only)
+  - `{"data": ""}` → `false` (empty string)
+- **Algorithm**: Use Python's `isalpha()` method
 
 ## 🔬 Testing Strategy
 
@@ -170,11 +185,11 @@ import requests
 
 # Test /data endpoint
 response = requests.post('http://localhost:5000/data', json={'data': 'hello'})
-print(response.json())  # {"result": 8183315}
+print(response.json())  # {"result": 1564557354}
 
 # Test /time endpoint
 response = requests.get('http://localhost:5000/time')
-print(response.json())  # {"result": 8183315}
+print(response.json())  # {"result": 1564557354}
 
 # Test /fizzbuzz endpoint
 response = requests.post('http://localhost:5000/fizzbuzz', json={'data': '15'})
@@ -198,18 +213,19 @@ explorer.run_comprehensive_test()
 
 ## 📋 Documentation
 
-- **`ENDPOINT_BEHAVIOR_REPORT.md`** - Comprehensive analysis of each endpoint's behavior
+- **`COMPREHENSIVE_API_ANALYSIS.md`** - **NEW**: Complete analysis based on actual testing with 53 test cases
+- **`ENDPOINT_BEHAVIOR_REPORT.md`** - Detailed analysis of each endpoint's behavior
 - **`API_ANALYSIS_REPORT.md`** - Detailed API analysis and findings
 - **`FINAL_ANALYSIS.md`** - Summary of the complete project
 
-## 🎯 Key Discoveries
+## 🎯 Key Discoveries (Corrected)
 
-1. **Hash Function in /data**: Deterministic mathematical transformation of input strings
-2. **FizzBuzz Implementation in /fizzbuzz**: Classic algorithm for divisibility by 3 and 5
-3. **Echo Function in /zap**: Simple input-to-output mapping
-4. **Pattern-Based Logic in /glitch**: Complex boolean logic based on input characteristics
-5. **Fixed Value in /time**: Constant reference value
-6. **Alphabetic Validation in /alpha**: String content validation function
+1. **Hash Function in /data**: MD5-based hash function producing deterministic integer outputs
+2. **Fixed Value in /time**: Returns constant reference value (hash of "hello")
+3. **FizzBuzz Implementation in /fizzbuzz**: Classic algorithm with number extraction from strings
+4. **Complex Pattern Logic in /glitch**: Multi-factor decision tree considering keywords, length, and character types
+5. **Perfect Echo Function in /zap**: Returns input exactly as-is with no transformation
+6. **Alphabetic Validation in /alpha**: Uses `isalpha()` method for string validation
 
 ## 🎯 Next Steps
 
