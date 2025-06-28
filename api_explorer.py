@@ -258,6 +258,64 @@ class APIExplorer:
                 if finding["input"] != finding["output"]:
                     print(f"    Transformation: '{finding['input']}' -> '{finding['output']}'")
     
+    def explore_alpha_endpoint(self):
+        """Explore the /alpha endpoint"""
+        print("\n🔤 Exploring /alpha endpoint...")
+        findings = []
+        
+        # Test with various inputs
+        test_cases = [
+            "hello", "world", "test", "123", "abc", "", "a", "aa", "aaa",
+            "Hello World", "hello world", "HELLO", "hello123", "123hello",
+            "alpha", "ALPHA", "Alpha", "aLPHA", "alPHA", "alpHA", "alphA",
+            "special!@#$%", "unicode: 🚀", "very long string " * 100
+        ]
+        
+        for test_input in test_cases:
+            result = self.test_endpoint("/alpha", data={"data": test_input})
+            findings.append({
+                "input": test_input,
+                "output": result.get("response", {}).get("result"),
+                "status": result.get("status_code")
+            })
+            print(f"  Input: '{test_input}' -> Output: {result.get('response', {}).get('result')}")
+        
+        # Analyze alpha patterns
+        self.analyze_alpha_patterns(findings)
+        return findings
+    
+    def analyze_alpha_patterns(self, findings: List[Dict]):
+        """Analyze patterns in /alpha endpoint responses"""
+        print("\n📊 Analyzing /alpha patterns:")
+        
+        # Check for length-based patterns
+        true_count = sum(1 for f in findings if f["output"] is True)
+        false_count = sum(1 for f in findings if f["output"] is False)
+        
+        print(f"  True responses: {true_count}, False responses: {false_count}")
+        
+        # Check if it's based on input length
+        for finding in findings:
+            input_len = len(str(finding["input"]))
+            if finding["output"] is True:
+                print(f"    True for length {input_len}: '{finding['input']}'")
+            else:
+                print(f"    False for length {input_len}: '{finding['input']}'")
+        
+        # Check for alphabetical patterns
+        print("  🔍 Checking alphabetical patterns...")
+        for finding in findings:
+            input_str = str(finding["input"])
+            if finding["output"] is True:
+                # Check if it contains only alphabetic characters
+                if input_str.isalpha():
+                    print(f"    TRUE for alphabetic: '{input_str}'")
+                else:
+                    print(f"    TRUE for non-alphabetic: '{input_str}'")
+        
+        # Look for specific patterns
+        print("  ❓ Pattern not immediately obvious - needs more investigation")
+    
     def run_comprehensive_test(self):
         """Run comprehensive tests on all endpoints"""
         print("🚀 Starting comprehensive API exploration...")
@@ -269,6 +327,7 @@ class APIExplorer:
         self.findings["fizzbuzz"] = self.explore_fizzbuzz_endpoint()
         self.findings["glitch"] = self.explore_glitch_endpoint()
         self.findings["zap"] = self.explore_zap_endpoint()
+        self.findings["alpha"] = self.explore_alpha_endpoint()
         
         # Generate summary report
         self.generate_report()
@@ -311,6 +370,12 @@ class APIExplorer:
         print("  - Accepts: POST with JSON data containing 'data' field")
         print("  - Returns: String result")
         print("  - Behavior: Echo function (returns input as-is)")
+        
+        # Alpha endpoint analysis
+        print("\n🔤 /alpha endpoint:")
+        print("  - Accepts: POST with JSON data containing 'data' field")
+        print("  - Returns: Boolean result")
+        print("  - Behavior: Pattern-based boolean response (needs more investigation)")
         
         print("\n" + "=" * 60)
         print("🎯 NEXT STEPS FOR DEEPER ANALYSIS:")

@@ -13,6 +13,7 @@ You are dropped into a malfunctioning system filled with mysterious API endpoint
 3. **POST /fizzbuzz** - Accepts string data, returns boolean
 4. **POST /glitch** - Accepts string data, returns boolean
 5. **POST /zap** - Accepts string data, returns string
+6. **POST /alpha** - Accepts string data, returns boolean
 
 ## 🛠️ Tools Included
 
@@ -74,6 +75,12 @@ python advanced_tester.py
 - **Input**: JSON with "data" field (string)
 - **Output**: String
 - **Behavior**: Echo function - returns input as-is
+
+### /alpha Endpoint
+- **Method**: POST
+- **Input**: JSON with "data" field (string)
+- **Output**: Boolean
+- **Behavior**: Additional pattern-based boolean response (length/content analysis needed)
 
 ## 🔬 Testing Strategy
 

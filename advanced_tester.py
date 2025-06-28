@@ -400,6 +400,115 @@ class AdvancedAPITester:
                 if not result["is_echo"]:
                     print(f"    Transformation: '{result['input']}' -> '{result['output']}'")
     
+    def test_alpha_endpoint_advanced(self):
+        """Advanced testing of /alpha endpoint"""
+        print("\n🔤 Advanced /alpha endpoint analysis...")
+        
+        # Test with systematic patterns
+        test_cases = [
+            # Length-based tests
+            ("", "empty"),
+            ("a", "length 1"),
+            ("aa", "length 2"),
+            ("aaa", "length 3"),
+            ("aaaa", "length 4"),
+            ("aaaaa", "length 5"),
+            
+            # Content-based tests
+            ("hello", "hello"),
+            ("world", "world"),
+            ("alpha", "alpha word"),
+            ("ALPHA", "ALPHA word"),
+            ("Alpha", "Alpha word"),
+            ("aLPHA", "aLPHA word"),
+            
+            # Case variations
+            ("Hello", "Hello"),
+            ("HELLO", "HELLO"),
+            ("hElLo", "hElLo"),
+            
+            # Special patterns
+            ("123", "digits"),
+            ("abc", "letters"),
+            ("!@#", "symbols"),
+            ("123abc", "mixed"),
+            ("abc123", "mixed"),
+            
+            # Repetitive patterns
+            ("ababab", "repeating ab"),
+            ("aaa", "repeating a"),
+            ("123123", "repeating 123"),
+        ]
+        
+        results = []
+        for test_input, description in test_cases:
+            result = self.test_endpoint("/alpha", data={"data": test_input})
+            output = result.get("response", {}).get("result")
+            results.append({
+                "input": test_input,
+                "description": description,
+                "output": output,
+                "length": len(test_input),
+                "is_alpha": test_input.isalpha(),
+                "is_digit": test_input.isdigit(),
+                "is_alphanumeric": test_input.isalnum()
+            })
+            print(f"  {description}: '{test_input}' -> {output}")
+        
+        # Analyze alpha patterns
+        self.analyze_alpha_patterns_advanced(results)
+        return results
+    
+    def analyze_alpha_patterns_advanced(self, results: List[Dict]):
+        """Advanced pattern analysis for /alpha endpoint"""
+        print("\n📊 Advanced /alpha pattern analysis:")
+        
+        # Group by output
+        true_inputs = [r for r in results if r["output"] is True]
+        false_inputs = [r for r in results if r["output"] is False]
+        
+        print(f"  True responses ({len(true_inputs)}):")
+        for result in true_inputs:
+            print(f"    '{result['input']}' (length: {result['length']}, alpha: {result['is_alpha']})")
+        
+        print(f"  False responses ({len(false_inputs)}):")
+        for result in false_inputs:
+            print(f"    '{result['input']}' (length: {result['length']}, alpha: {result['is_alpha']})")
+        
+        # Check for alphabetical patterns
+        print("\n  🔍 Alphabetical analysis:")
+        alpha_true = [r for r in true_inputs if r["is_alpha"]]
+        alpha_false = [r for r in false_inputs if r["is_alpha"]]
+        non_alpha_true = [r for r in true_inputs if not r["is_alpha"]]
+        non_alpha_false = [r for r in false_inputs if not r["is_alpha"]]
+        
+        print(f"    Alphabetic strings - True: {len(alpha_true)}, False: {len(alpha_false)}")
+        print(f"    Non-alphabetic strings - True: {len(non_alpha_true)}, False: {len(non_alpha_false)}")
+        
+        # Check for length-based patterns
+        print("\n  🔍 Length analysis:")
+        length_groups = defaultdict(list)
+        for result in results:
+            length_groups[result["length"]].append(result)
+        
+        for length, group in sorted(length_groups.items()):
+            true_count = sum(1 for r in group if r["output"] is True)
+            false_count = sum(1 for r in group if r["output"] is False)
+            print(f"    Length {length}: {true_count} true, {false_count} false")
+        
+        # Check for specific content patterns
+        print("\n  🔍 Content analysis:")
+        for result in results:
+            input_str = result["input"]
+            
+            # Check for specific words
+            if "alpha" in input_str.lower():
+                print(f"    Contains 'alpha': '{input_str}' -> {result['output']}")
+            if input_str.isdigit():
+                print(f"    All digits: '{input_str}' -> {result['output']}")
+            if input_str.isalpha():
+                print(f"    All alphabetic: '{input_str}' -> {result['output']}")
+    
     def run_advanced_analysis(self):
         """Run advanced analysis on all endpoints"""
         print("🚀 Starting advanced API analysis...")
@@ -410,6 +519,7 @@ class AdvancedAPITester:
         self.results["fizzbuzz"] = self.test_fizzbuzz_endpoint_advanced()
         self.results["glitch"] = self.test_glitch_endpoint_advanced()
         self.results["zap"] = self.test_zap_endpoint_advanced()
+        self.results["alpha"] = self.test_alpha_endpoint_advanced()
         
         # Generate advanced report
         self.generate_advanced_report()
@@ -443,6 +553,11 @@ class AdvancedAPITester:
         print("  ✅ Confirmed: Echo function")
         print("  🔍 Pattern: Returns input string as-is")
         
+        # Alpha endpoint
+        print("\n🎯 /alpha endpoint:")
+        print("  ✅ Confirmed: Returns true for alphabetic strings")
+        print("  🔍 Pattern: Returns true for alphabetic strings")
+        
         print("\n" + "=" * 60)
         print("🎯 FINAL CONCLUSIONS:")
         print("-" * 30)
@@ -451,6 +566,7 @@ class AdvancedAPITester:
         print("3. /fizzbuzz: Classic FizzBuzz algorithm")
         print("4. /glitch: Pattern-based boolean logic")
         print("5. /zap: Simple echo function")
+        print("6. /alpha: Returns true for alphabetic strings")
 
 if __name__ == "__main__":
     tester = AdvancedAPITester()

@@ -78,5 +78,19 @@ def test_api_directly():
     except Exception as e:
         print(f"Error: {e}")
 
+    # Test /alpha endpoint
+    print("\n🔤 Testing /alpha endpoint:")
+    try:
+        response = requests.post(f"{base_url}/alpha", json={"data": "hello"})
+        print(f"Status Code: {response.status_code}")
+        print(f"Headers: {dict(response.headers)}")
+        print(f"Response Text: {response.text}")
+        try:
+            print(f"Response JSON: {response.json()}")
+        except:
+            print("Response is not JSON")
+    except Exception as e:
+        print(f"Error: {e}")
+
 if __name__ == "__main__":
     test_api_directly() 

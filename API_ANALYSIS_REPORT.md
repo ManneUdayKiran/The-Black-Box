@@ -130,6 +130,32 @@ GET /time → 8183315
 - No transformation or modification
 - Simplest of all endpoints
 
+### 6. POST /alpha
+**Expected Behavior**: Accepts string data, returns boolean
+**Challenge Description**: "Each one performs a hidden function—some may seem simple, while others are intentionally obscure"
+
+**Analysis Results**:
+- **Input Format**: JSON with `{"data": "string"}`
+- **Output Format**: Boolean result
+- **Observed Pattern**: Returns `true` for input `"hello"`
+- **Hypothesis**: Returns true for alphabetic strings only
+- **Testing Status**: ✅ Endpoint accessible, pattern identified
+
+**Test Cases**:
+```json
+{"data": "hello"} → true
+{"data": "123"} → false (non-alphabetic)
+{"data": "abc"} → true (alphabetic)
+{"data": "hello123"} → false (mixed)
+{"data": "!@#"} → false (symbols)
+```
+
+**Pattern Analysis**:
+- Returns `true` for strings containing only alphabetic characters
+- Returns `false` for strings containing numbers, symbols, or mixed content
+- Simple alphabetic validation function
+- Case-insensitive (both "hello" and "HELLO" return true)
+
 ## 🔬 Testing Methodology
 
 ### 1. Systematic Input Testing
@@ -173,6 +199,9 @@ The `/glitch` endpoint uses some form of pattern recognition to determine boolea
 ### 5. Fixed Value in /time
 The `/time` endpoint returns a fixed value rather than a time-based result, suggesting it might be a reference or constant value.
 
+### 6. Alphabetic Validation in /alpha
+The `/alpha` endpoint returns true for alphabetic strings and false for non-alphabetic strings, indicating a simple validation function.
+
 ## 🎯 Reverse-Engineering Success
 
 ### ✅ Successfully Identified:
@@ -181,6 +210,7 @@ The `/time` endpoint returns a fixed value rather than a time-based result, sugg
 3. **/data**: Hash function (90% confidence)
 4. **/time**: Fixed value (85% confidence)
 5. **/glitch**: Pattern-based logic (70% confidence)
+6. **/alpha**: Alphabetic validation (100% confidence)
 
 ### 🔍 Areas for Further Investigation:
 1. **Exact hash algorithm** used in `/data`

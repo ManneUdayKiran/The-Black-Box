@@ -205,6 +205,76 @@ class WorkingAPITester:
         
         return results
     
+    def test_alpha_endpoint(self):
+        """Test the /alpha endpoint"""
+        print("\n🔤 Testing /alpha endpoint...")
+        print("-" * 40)
+        
+        # Test with various inputs
+        test_cases = [
+            "hello", "world", "test", "123", "abc", "", "a", "aa", "aaa",
+            "alpha", "ALPHA", "Alpha", "aLPHA", "alPHA", "alpHA", "alphA",
+            "Hello World", "hello world", "HELLO", "hello123", "123hello",
+            "special!@#$%", "unicode: 🚀", "very long string " * 100
+        ]
+        
+        results = []
+        for test_input in test_cases:
+            result = self.test_endpoint("/alpha", data={"data": test_input})
+            if result["success"]:
+                output = result["response"].get("result")
+                print(f"  Input: '{test_input}' → Output: {output}")
+                results.append({
+                    "input": test_input,
+                    "output": output,
+                    "status": "success"
+                })
+            else:
+                print(f"  Input: '{test_input}' → Error: {result['response'].get('error')}")
+                results.append({
+                    "input": test_input,
+                    "output": None,
+                    "status": "error",
+                    "error": result["response"].get("error")
+                })
+        
+        # Analyze alpha patterns
+        self.analyze_alpha_patterns(results)
+        return results
+    
+    def analyze_alpha_patterns(self, results: List[Dict]):
+        """Analyze patterns in /alpha endpoint responses"""
+        print("\n📊 Analyzing /alpha patterns:")
+        
+        # Check for alphabetical patterns
+        alpha_true = 0
+        alpha_false = 0
+        non_alpha_true = 0
+        non_alpha_false = 0
+        
+        for result in results:
+            if result["status"] == "success" and result["output"] is not None:
+                input_str = result["input"]
+                if input_str.isalpha():
+                    if result["output"] is True:
+                        alpha_true += 1
+                    else:
+                        alpha_false += 1
+                else:
+                    if result["output"] is True:
+                        non_alpha_true += 1
+                    else:
+                        non_alpha_false += 1
+        
+        print(f"  Alphabetic strings - True: {alpha_true}, False: {alpha_false}")
+        print(f"  Non-alphabetic strings - True: {non_alpha_true}, False: {non_alpha_false}")
+        
+        # Check for specific patterns
+        if alpha_true > 0 and non_alpha_false > 0:
+            print("  ✅ Pattern: Returns true for alphabetic strings only")
+        else:
+            print("  ❓ Pattern not immediately obvious - needs more investigation")
+    
     def analyze_patterns(self):
         """Analyze patterns in the collected results"""
         print("\n📊 Pattern Analysis")
@@ -274,6 +344,7 @@ class WorkingAPITester:
         self.results["fizzbuzz"] = self.test_fizzbuzz_endpoint()
         self.results["glitch"] = self.test_glitch_endpoint()
         self.results["zap"] = self.test_zap_endpoint()
+        self.results["alpha"] = self.test_alpha_endpoint()
         
         # Analyze patterns
         self.analyze_patterns()
